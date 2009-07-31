@@ -1,0 +1,29 @@
+Sparse Online Gaussian Process library
+by Dan Grollman
+Brown University
+(dang_AT_cs.brown.edu)
+
+This code is based on the work of Csato and Opper.  In particular, the
+equations were drawn from Lehel Csato's PhD thesis (Aston University
+2002:
+http://www.kyb.tuebingen.mpg.de/bs/people/csatol/ogp/thesis/index.html).
+The results of this code were checked against the ogp Matlab library,
+also written by Csato and available at http://www.gaussianprocess.org/
+
+I release this code for general non-profit and academic use, without
+warrenty or guarentee of any kind.  If you wish to use / modify /
+update / improve this code, please contact me.
+----------------------------------------------
+Notes:
+
+This code assumes Gaussian noise.
+This code depends on the newmat C++ matrix library, by Robert Davies
+
+------------------------------------------------
+Installation instructions:
+
+run ./configure --prefix=PREFIX
+	where PREFIX is where you want the library installed
+run make
+run make check
+run make install
