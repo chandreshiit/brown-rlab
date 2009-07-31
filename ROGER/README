@@ -1,0 +1,4 @@
+This is an implementation of ROGER (Realtime Overlapping Gaussian
+Expert Regression), a sparse, incremental algorithm for estimation and
+prediction in an infinite mixture of Gaussian Process experts model.
+
