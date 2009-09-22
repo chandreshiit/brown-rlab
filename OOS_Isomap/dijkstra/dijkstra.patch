@@ -1,0 +1,24 @@
+8c8
+< 
+---
+> using namespace std;
+15c15
+< #include <iostream.h>
+---
+> #include <iostream>
+17d16
+< #include <conio.h>
+71c70
+< #include <iostream.h>
+---
+> #include <iostream>
+73d71
+< #include <conio.h>
+468c466
+< 
+---
+> /*
+518c516
+< 
+---
+> */
