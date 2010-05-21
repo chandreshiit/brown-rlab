@@ -1,0 +1,92 @@
+% \documentclass[12pt]{book}
+\documentclass[12pt,openany]{book} % openany option allows chapters to start not just on odd pages (so gets rid of blank pages)
+\usepackage{color}
+%\usepackage{colortbl}
+\usepackage{hyperref}
+\usepackage{graphicx}
+\usepackage{fancyhdr}
+\usepackage{version}
+\usepackage{wrapfig}
+%\usepackage[all,dark]{draftcopy}
+\usepackage{type1cm} % watermark
+\usepackage{eso-pic} % watermark
+
+\excludeversion{COMMENT}
+
+
+\pagestyle{fancy}
+%\pagestyle{headings}
+
+\setlength{\oddsidemargin}{0.0in}
+\setlength{\evensidemargin}{0.0in}
+\setlength{\topmargin}{-0.0in}
+\setlength{\headheight}{0.0in}
+\setlength{\textwidth}{6.5in}
+\setlength{\textheight}{8.5in}
+\setlength{\headwidth}{\textwidth}
+
+\newcommand{\bkorel}[1]{\textcolor{red}{bkorel: {#1}}}
+\newcommand{\cjenkins}[1]{\textbf{\textcolor{blue}{cjenkins: {#1}}}}
+\newcommand{\hilight}[1]{\colorbox{yellow}{#1}}
+
+
+\makeatletter
+\AddToShipoutPicture{%
+            \setlength{\@tempdimb}{.5\paperwidth}%
+            \setlength{\@tempdimc}{.5\paperheight}%
+            \setlength{\unitlength}{1pt}%
+            \put(\strip@pt\@tempdimb,\strip@pt\@tempdimc){%
+        \makebox(0,0){\rotatebox{45}{\textcolor[gray]{0.75}%
+        {\fontsize{6cm}{6cm}\selectfont{DRAFT}}}}%
+            }%
+}
+\makeatother
+
+\title{Teaching Autonomous Robotics Using Player and ROS: \\ A CS 148 Starter Guide (DRAFT)}
+\author{Barbara Teresa Korel \hspace{1cm} Odest Chadwicke Jenkins}
+
+\begin{document}
+
+\maketitle
+
+% % \title{Teaching Autonomous Mobile Robotics using Player and ROS}
+% % \date{Spring 2010}
+% % \author{Jenkins\\ Korel\\ Crick\\}
+% % \maketitle
+% % \newpage
+
+% preamble distinguishing this draft from final book
+
+\chapter*{Foreword}
+
+This draft contains the first three chapters of the developing textbook ``Teaching Autonomous Robotics Using Player and ROS''.  This draft satisfies the project requirements for Barbara Korel towards the completion of her Masters degree in Computer Science at Brown University, under the supervision of Prof. Chad Jenkins.  This book is based on the development and experiences restructuring an undergraduate robotics course, Brown University CS 148 ``Building Intelligent Robots'', for the iRobot Create platform.  Chad Jenkins has taught this updated version of CS 148 since 2006, with Barbara Korel serving as Head Teaching Assistant in 2009.
+
+This draft is intended to serve as a ``how-to'' guide to setup a basic low-cost mobile robot platform for use in an upper-level undergraduate robotics course.  Subsequent chapters will cover project modules suitable for courses using the described robot platform.  The projects will cover bug and random navigation algorithms, color object recognition, path planning, robot localization, subsumption architectures, multi-robot coordination, learning from demonstration, and experimentation with significance testing.  Up-to-date developments for these materials can be found from the CS 148 website (http://www.cs.brown.edu/courses/cs148) and the Brown Robotics code repository (http://code.google.com/p/brown-rlab/).
+
+\begin{titlepage}
+
+\begin{center}
+\includegraphics[scale=0.76]{figures/book_cover_may2010.pdf}
+%\includegraphics[scale=0.76]{figures/book_cover.pdf}
+\end{center}
+
+\end{titlepage}
+
+\lhead{Teaching Autonomous Robotics with Player and ROS  }
+
+\tableofcontents
+\newpage
+
+\input{1_course_objectives}
+\input{2_getting_started}
+\input{3_robot_middleware}
+\input{4_create_spotting}
+\input{5_enclosure_escape}
+\input{6_object_seeking}
+\input{7_path_planning}
+\input{8_localization}
+\input{9_subsumption}
+\input{10_multi_robot}
+\input{11_learning}
+
+\end{document}
