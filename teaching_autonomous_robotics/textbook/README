@@ -1,0 +1,32 @@
+
+README file for
+
+Teaching Autonomous Robotics Using Player and ROS: 
+A CS 148 Starter Guide (DRAFT)
+Chad Jenkins
+Basia Korel
+
+----
+
+This document is an unfinished working draft for the "Teaching Autonomous Robotics" textbook, in development, based on Brown University course CS 148, "Building Intelligent Robots."  Although a work in progress, Chapters 2 and 3 provide a quick start guide for installing, using, and programming mobile robots with Player and ROS.
+
+----
+
+A non-updated version of this draft can be downloaded from:
+
+  http://www.cs.brown.edu/~cjenkins/papers/cs148_textbook_bkorel_may2010.pdf
+
+For a up-to-date PDF document of the textbook, pdflatex should be used to build document (main.pdf) from our LaTeX source, using the following commands:
+
+> svn checkout http://brown-rlab.googlecode.com/svn/trunk/teaching_autonomous_robotics/textbook brown-rlab-read-only
+
+(and in the "textbook" directory)
+
+> pdflatex main.tex
+> pdflatex main.tex
+
+Information about obtaining and installing pdflatex can be found online, namely through the pdfTeX website or Wikipedia page:
+
+  http://www.tug.org/applications/pdftex/
+  http://en.wikipedia.org/wiki/PdfTeX
+
