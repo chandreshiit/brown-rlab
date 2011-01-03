@@ -1,3 +1,3 @@
-EXTRA_DIST = README AUTHORS
-SUBDIRS = ROGER
-TESTS = ROGER/ROGERtest
+SUBDIRS = lib tests utils
+
+TESTS = tests/ROGERtest

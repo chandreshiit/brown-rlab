@@ -1,0 +1,27 @@
+Congrats on obtaining ROGER.
+
+---------------------------------------------------------------
+To install from svn:
+autoreconf -i
+GOTO install from distribution
+---------------------------------------------------------------
+To install from distribution:
+tar -xvf roger-1.6.tar.gz 
+cd roger-1.6
+./configure LDFLAGS=-L[where SOGP and NEWMAT are] (/lib)
+            CPPFLAGS=-I[likewise]                 (/include) 
+            --prefix=[where you want ROGER installed...the same?]
+make
+make check
+make install
+---------------------------------------------------------------
+To make a distribution (edit distibution number in configure.ac):
+autoreconf -i
+./configure LDFLAGS=-L[where SOGP and NEWMAT are] (/lib)
+            CPPFLAGS=-I[likewise]                 (/include) 
+make distcheck
+---------------------------------------------------------------
+---------------------------------------------------------------
+For developers:
+svn ignores much of the autoconf stuff, to delete the others run:
+make maintainer-clean
