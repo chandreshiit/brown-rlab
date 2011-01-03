@@ -22,12 +22,18 @@ close plot automatically?  or reuse?
 int main(int argc, char **argv){
   int seed = time(NULL);
   bool valgrind = true;
-  
+	bool view = true;
+	bool captest=true;
+
   for(int argi=1;argi<argc;argi++){
     if(!strcmp(argv[argi],"-s"))
       seed = atoi(argv[++argi]);
-    if(!strcmp(argv[argi],"-v"))
+		if(!strcmp(argv[argi],"-v"))
       valgrind = false;
+    if(!strcmp(argv[argi],"-z"))
+      view = false;
+    if(!strcmp(argv[argi],"-c"))
+      captest = false;
   }
 
   printf("Seed is %d\n",seed);
@@ -75,17 +81,18 @@ int main(int argc, char **argv){
   mse_base = mse;
   
   //Display for the user
-  system("echo \'plot \"output.txt\";replot \"regress.txt\"\' | gnuplot -persist");
+	if(view)
+		system("echo \'plot \"output.txt\";replot \"regress.txt\"\' | gnuplot -persist");
 
   //Test FILE IO
   printf("Testing File IO.");
-  m_SOGP->save("savedSOGP");
+  m_SOGP->save("savedSOGP.txt");
   delete m_SOGP;
   m_SOGP = new SOGP;
-  m_SOGP->load("savedSOGP");
-  m_SOGP->save("resavedSOGP");
+  m_SOGP->load("savedSOGP.txt");
+  m_SOGP->save("resavedSOGP.txt");
   printf("\nTesting load/save.  Differences between stars\n******\n");
-  system("diff -a savedSOGP resavedSOGP");//Do this better?
+  system("diff -a savedSOGP.txt resavedSOGP.txt");//Do this better?
   printf("******\n");
 
   //Test that reloaded is correct
@@ -114,10 +121,10 @@ int main(int argc, char **argv){
       //Make data
       Matrix in(din,N), out(dout,N);
       for(int n=1;n<=N;n++){
-	for(int d=1;d<=din;d++)
-	  in(d,n)=inputs(n);
-	for(int d=1;d<=dout;d++)
-	  out(d,n)=outputs(n);
+				for(int d=1;d<=din;d++)
+					in(d,n)=inputs(n);
+				for(int d=1;d<=dout;d++)
+					out(d,n)=outputs(n);
       }
       m_SOGP=new SOGP();
       m_SOGP->addM(in,out);
@@ -132,7 +139,7 @@ int main(int argc, char **argv){
   printf("Testing that as widths go up, number of BVs go down.");
   int BVsize=100;
   for(double wid=.1;wid<=2;wid+=.1){
-    m_SOGP= new SOGP(1,wid,.1);
+    m_SOGP= new SOGP(wid,.1);
     m_SOGP->addM(inputs,outputs);
     int size = m_SOGP->size();
     if(size>BVsize+3){//Minor changes are OK
@@ -151,48 +158,58 @@ int main(int argc, char **argv){
   printf("Returns Col with %d rows \t\t\t\t %s\n",mus.Nrows(),mus.Nrows()==0?"PASS":"FAIL");
   delete m_SOGP;
 
-  //Make a prediction for size:
-  printf("Predicting realtime (33ms) capacity\n");
-  m_SOGP = new SOGP(.001,.001);
-  int cap=1;
-  int state=0;
-  bool stop=false;
-  double ms=0;
-  timeval begin,end;
-  ColumnVector in(1), out(1);
-  while(!stop){
-    m_SOGP->change_capacity(cap);
-    printf("%d ",cap);
-    fflush(stdout);
 	
-    //Fill to capacity
-    while(m_SOGP->size()!=cap){
-      in(1)= -1 + rand()/(RAND_MAX/2.0);
-      out(1)= -1 + rand()/(RAND_MAX/2.0);
-      m_SOGP->add(in,out);
-    }
+	printf("Testing logprob of zeros from empty GP\n");
+	m_SOGP = new SOGP(.1,.1);
+	ColumnVector in(2),out(2);
+	in(1)=0;in(2)=0;out(1)=0;out(2)=0;
+	printf("lp is %lf\n",m_SOGP->log_prob(in,out));
+	m_SOGP->add(in,out);
+	printf("lp is %lf\n",m_SOGP->log_prob(in,out));
 	
-    //Thrash 30 times, get average
-    for(int i=0;i<30;i++){
-      in(1)= -1 + rand()/(RAND_MAX/2.0);
-      out(1)= -1 + rand()/(RAND_MAX/2.0);
-      gettimeofday(&begin,NULL);
-      m_SOGP->add(in,out);
-      gettimeofday(&end,NULL);
-      int diff = (end.tv_sec-begin.tv_sec)*1000000 + end.tv_usec - begin.tv_usec;
-      ms += (diff/1000.0);
-    }
-    ms/=30.0;
-    
-    switch(state){
-    case 0: if(ms<33){cap+=100;break;}else state=1; //Going up
-    case 1: if(ms>33){cap-=10;break;}else state=2; //Going down
-    case 2: if(ms<33){cap+=1;break;}else{stop = true;cap-=5;state=1;}
-    }
-  }
-  printf("(%lf)\n",ms);
-  delete m_SOGP;
-    
+	//Make a prediction for size:
+	if(captest){
+		printf("Predicting realtime (33ms) capacity\n");
+		m_SOGP = new SOGP(.001,.001);
+		int cap=1;
+		int state=0;
+		bool stop=false;
+		double ms=0;
+		timeval begin,end;
+		//ColumnVector in(1), out(1);
+		while(!stop){
+			m_SOGP->change_capacity(cap);
+			printf("%d ",cap);
+			fflush(stdout);
+			
+			//Fill to capacity
+			while(m_SOGP->size()!=cap){
+				in(1)= -1 + rand()/(RAND_MAX/2.0);
+				out(1)= -1 + rand()/(RAND_MAX/2.0);
+				m_SOGP->add(in,out);
+			}
+			
+			//Thrash 30 times, get average
+			for(int i=0;i<30;i++){
+				in(1)= -1 + rand()/(RAND_MAX/2.0);
+				out(1)= -1 + rand()/(RAND_MAX/2.0);
+				gettimeofday(&begin,NULL);
+				m_SOGP->add(in,out);
+				gettimeofday(&end,NULL);
+				int diff = (end.tv_sec-begin.tv_sec)*1000000 + end.tv_usec - begin.tv_usec;
+				ms += (diff/1000.0);
+			}
+			ms/=30.0;
+			
+			switch(state){
+			case 0: if(ms<33){cap+=100;break;}else state=1; //Going up
+			case 1: if(ms>33){cap-=10;break;}else state=2; //Going down
+			case 2: if(ms<33){cap+=1;break;}else{stop = true;cap-=5;state=1;}
+			}
+		}
+		printf("(%lf)\n",ms);
+		delete m_SOGP;
+	}
 
   //Test for memory leaks
   if(valgrind){//Doesn't run it?
@@ -203,6 +220,6 @@ int main(int argc, char **argv){
   }
 
   //Clean
-  system("rm -f output.txt regress.txt resavedSOGP savedSOGP");
+  system("rm -f *.txt");
 }
 

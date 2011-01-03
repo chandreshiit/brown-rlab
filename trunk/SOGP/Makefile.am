@@ -1,3 +1,2 @@
-EXTRA_DIST = README AUTHORS
-SUBDIRS = SOGP
-TESTS = SOGP/SOGPtest
+SUBDIRS = lib tests utils
+TESTS = tests/SOGPtest
