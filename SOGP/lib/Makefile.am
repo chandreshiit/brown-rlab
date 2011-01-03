@@ -3,6 +3,4 @@ libSOGP_a_SOURCES = SOGP.cc SOGP_aux.cc
 
 include_HEADERS = SOGP.h SOGP_aux.h
 
-check_PROGRAMS = SOGPtest
-SOGPtest_SOURCES = SOGPtest.cc
-SOGPtest_LDADD = libSOGP.a
+AM_CPPFLAGS = -Wall

@@ -19,14 +19,15 @@ Auto adapt parameters?
 
 class SOGP{
  public:
+	int m_id;
+
   //Constructors
+	SOGP(const SOGP *);
   SOGP(){//defaults
     SOGPParams params;
     setParams(params);
   }
-  SOGP(SOGPParams params){
-    setParams(params);
-  }
+  SOGP(SOGPParams params);
   //1D RBF case
   SOGP(double w,double s20, int cap=0){
     RBFKernel kern(w);
@@ -93,7 +94,8 @@ class SOGP{
     m_params.capacity=cap;
   }
 
- private: 
+	//private: 
+	int total_count;//How many points have I seen?
   int current_size;  //how many points do I have
   Matrix alpha;      //Alpha and C are the parameters of the GP
                      //Alpha is NxDout
@@ -111,6 +113,7 @@ class SOGP{
   void setParams(SOGPParams params){
     m_params=params;
     current_size=0;
+		total_count=0;
   }
 };
 
