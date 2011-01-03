@@ -39,21 +39,21 @@ Cephes Math Library Release 2.8:  June, 2000
 Copyright 1984, 1987, 1989, 1992, 2000 by Stephen L. Moshier
 Translated to AlgoPascal by Bochkanov Sergey (2005, 2006, 2007).
 *************************************************************************/
-double lngamma(double x, double& sgngam)
+long double lngamma(long double x, long double& sgngam)
 {
-    double result;
-    double a;
-    double b;
-    double c;
-    double p;
-    double q;
-    double u;
-    double w;
-    double z;
-    int i;
-    double logpi;
-    double ls2pi;
-    double tmp;
+	long double result;
+	long double a;
+	long double b;
+	long double c;
+	long double p;
+	long double q;
+	long double u;
+	long double w;
+	long double z;
+	int i;
+	long double logpi;
+	long double ls2pi;
+	long double tmp;
 
     sgngam = 1;
     logpi = 1.14472988584940017414;

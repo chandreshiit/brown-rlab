@@ -64,6 +64,7 @@ int main(int argc, char **argv){
   SOGP *m_SOGP = new SOGP(params);
   m_ROGER = new ROGER(P,alpha,params,k,mu,v,lambda);
   for(int n=1;n<=N;n++){
+		//printf("%d\n",n);
     m_SOGP->add(inputs.Column(n),outputs.Column(n));
     m_ROGER->add(inputs.Column(n),outputs.Column(n));
   }
@@ -79,7 +80,7 @@ int main(int argc, char **argv){
   }
   mse/=N;
   mse2/=N;
-  printf("MAP is %d with weight %lf and %d experts. \t %s\n",
+  printf("MAP is %d with weight %Lf and %d experts. \t %s\n",
 	 m_ROGER->mapi,
 	 m_ROGER->weights[m_ROGER->mapi],
 	 m_ROGER->particles[m_ROGER->mapi]->experts.size(),
@@ -102,7 +103,7 @@ int main(int argc, char **argv){
     mse+=(err*err);
   }
   mse/=N;
-  printf("MAP is %d with weight %lf and %d experts\n",
+  printf("MAP is %d with weight %Lf and %d experts\n",
 	 m_ROGER->mapi,
 	 m_ROGER->weights[m_ROGER->mapi],
 	 m_ROGER->particles[m_ROGER->mapi]->experts.size());
@@ -116,7 +117,7 @@ int main(int argc, char **argv){
   for(int n=1;n<=N;n++){
     m_ROGER->add(inputs.Column(n),outX.Column(n));
   }
-  printf("MAP is %d with weight %lf and %d experts. \t %s\n",
+  printf("MAP is %d with weight %Lf and %d experts. \t %s\n",
 	 m_ROGER->mapi,
 	 m_ROGER->weights[m_ROGER->mapi],
 	 m_ROGER->particles[m_ROGER->mapi]->experts.size(),
@@ -160,16 +161,27 @@ int main(int argc, char **argv){
   //Test given experts
   printf("Testing given experts\n");
   delete m_ROGER;
-  m_ROGER = new ROGER(P,alpha,params,k,mu,v,lambda);
+  m_ROGER = new ROGER(1,alpha,params,k,mu,v,lambda);
   FILE *fp=fopen("given_experts.txt","w");
-  fprintf(fp,"%lf\n%lf\n%lf\n%lf\n%lf\n",1.0,2.0,5.0,3.0,4.3);
+  fprintf(fp,"%lf\n%lf\n%lf\n%lf\n%lf\n%lf",1.0,2.0,5.0,3.0,4.3,1.0);
   fclose(fp);
   m_ROGER->use_given("given_experts.txt");
-  for(int i=1;i<=5;i++)
+	m_ROGER->verbose=true;
+  for(int i=1;i<=6;i++)
     m_ROGER->add(inputs.Column(i),outputs.Column(i));
   printf("Assignments are:\n");
   m_ROGER->particles[0]->printass(stdout);
   printf("\n");
+	printf("Probability of these assignments given params is: %Lf\n",m_ROGER->weights[0]);
+	//Test save/read
+	m_ROGER->printTo("savedROGER.txt");
+  delete m_ROGER;
+  m_ROGER = new ROGER;
+  m_ROGER->readFrom("savedROGER.txt");
+  m_ROGER->printTo("resavedROGER.txt");
+  printf("Save and Load test.  Differences between stars\n******\n");
+  system("diff -a savedROGER.txt resavedROGER.txt");
+  printf("******\n");
 
   //Test Lp_tpp
 

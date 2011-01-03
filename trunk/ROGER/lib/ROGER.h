@@ -1,10 +1,11 @@
 /*Particle filter for IMGPE
-
   Define the Particle Filter Class
     add,predict
 Dang
 
 TODO:
+FULL REWRITE!  Distributions should all be separate and modular
+
 Make more ROGER, less PF
 standardize order of arguments
 Explain parameters
@@ -21,16 +22,14 @@ Needs serious cleaning and efficiency - split?
 
 class Expert{
  public:
+	int m_id;
   Expert(){};
-  Expert(SOGPParams param,double k,const ColumnVector& m, double v,const Matrix& l){
-    //printf("Making expert\n");
-    m_SOGP = new SOGP(param);
-    k_0=k;mu_0=m;v_0=v;lambda_0=l;
-    count=0;
-  };
+	~Expert();
+	Expert(const Expert*);
+  Expert(SOGPParams param,double k,const ColumnVector& m, double v,const Matrix& l);
   //Incorporate this data into this expert
   void sit(const ColumnVector& in, const ColumnVector& out);
-  double lp_tpp(const ColumnVector& in,bool update);//really this should be above? Rename
+  long double lp_tpp(const ColumnVector& in,bool update);//really this should be above? Rename
   //Wrappers for the GP stuff
   double lp(const ColumnVector&in, const ColumnVector& out){
     return m_SOGP->log_prob(in,out);
@@ -39,7 +38,7 @@ class Expert{
     return m_SOGP->predict(in,sigconf,conf);
   }
   
-  int count; //Same as current_size m_GP.current_size
+  int count; //Total number of points assigned here
   bool printTo(FILE *fp);
   bool printTo(const char *name){
     FILE *fp=fopen(name,"w");
@@ -55,20 +54,25 @@ class Expert{
     return ret;
   };
 
+	//For hallucination
+	//double hallucinate1Dinput();
+	//double hallucinate1Doutput(double);
 
-  private:
-  //The Gaussian Process
-  SOGP *m_SOGP;
+
+  //private:
   //Sufficient Statistics for lp_tpp
   ColumnVector mean;
   Matrix sumsq;
   Matrix inv_cov;
-  double log_det_cov;
+  long double log_det_cov;
   //Input space paramters - confidence (in) center, confidence (in) invcov
   double k_0,v_0;
   //Note!  v_0 must be >= input_dimensionality ?
   ColumnVector mu_0;
   Matrix lambda_0;
+	int count2;
+  //The Gaussian Process
+	SOGP *m_SOGP;
 };
 
 //Should this start with an empty expert?
@@ -78,10 +82,11 @@ class Particle{
   double k_0,v_0;
   ColumnVector mu_0;
   Matrix lambda_0;
-  vector<Expert>experts;
+  vector<Expert*>experts;
   vector<int>assignments;//The seating arrangement
   int kplus;
   void sitat(const ColumnVector& in, const ColumnVector& out, int table);
+	~Particle();
   Particle(){
     kplus=0;
   }
@@ -92,7 +97,7 @@ class Particle{
     v_0=p->v_0;
     lambda_0=p->lambda_0;
     for(unsigned int e=0;e<p->experts.size();e++){
-      Expert nexp(p->experts[e]);
+      Expert *nexp = new Expert(p->experts[e]);
       experts.push_back(nexp);
     }
     for(unsigned int a=0;a<p->assignments.size();a++)
@@ -126,7 +131,7 @@ class ParticleFilter{
  public:
   int NumParticles;
   Particle **particles;
-  double *weights;
+  long double *weights;
   Expert *empty_expert;
   int din,dout;
   void addM(const Matrix&, const Matrix&);
@@ -141,6 +146,8 @@ class ParticleFilter{
     int part,expert;
     return predict(input,sigconf,MAX,MAX,part,expert,conf);
   }
+	//1 D for now, should be general
+	//void hallucinate1D(double &x, double &y);//Generate data from the current model
 
   double alpha;  //Concentration parameter
   int count;
@@ -154,14 +161,15 @@ class ParticleFilter{
     init();
   }
   ParticleFilter(int NP,double a,SOGPParams param,double k,const ColumnVector& m,double v,const Matrix& l){
-    NumParticles=NP;
-    alpha=a;
-    particles=new Particle*[NP];
-    weights=new double[NP];
-    for(int p=0;p<NP;p++){
+		NumParticles=NP;
+		alpha=a;
+		particles=new Particle*[NP];
+		weights=new long double[NP];
+		for(int p=0;p<NP;p++){
       particles[p]=new Particle();
       particles[p]->sogpparam=param;
       weights[p]=1.0/NumParticles;
+			//printf("Set weight to %Lf (%d:%d)\n",weights[p],NP,NumParticles);
       particles[p]->k_0=k;
       particles[p]->mu_0=m;
       particles[p]->v_0=v;
@@ -194,10 +202,12 @@ class ParticleFilter{
   void use_given(const char *fn){
     printf("Using given experts in %s\n",fn);
     given_assignments=fopen(fn,"r");
+		weights[0]=0;
     if(!given_assignments){
       perror("ROGER use_given:");
       exit(-1);
     }
+		NumParticles=1;
   }
   void add_given(const ColumnVector& input,const ColumnVector&output,int exp);
   void add_given(const ColumnVector& input,const ColumnVector& output);
@@ -212,7 +222,6 @@ class ParticleFilter{
     verbose=false;
     given_assignments=NULL;
   }
-  
 };
 
 typedef ParticleFilter ROGER;
